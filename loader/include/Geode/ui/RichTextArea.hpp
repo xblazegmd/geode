@@ -129,7 +129,7 @@ namespace geode {
         RichTextArea();
         ~RichTextArea() override;
     private:
-        static SimpleTextArea* create(std::string font, std::string text, float scale, float width, const bool artificialWidth);
+        static RichTextArea* create(std::string font, std::string text, float scale, float width, const bool artificialWidth);
         bool init(std::string font, std::string text, float scale, float width, const bool artificialWidth);
 
         class Impl;

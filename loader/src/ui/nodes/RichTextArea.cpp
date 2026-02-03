@@ -401,6 +401,31 @@ void RichTextArea::Impl::formatText() {
 RichTextArea::RichTextArea() : m_impl(std::make_unique<RichTextArea::Impl>(this)) {}
 RichTextArea::~RichTextArea() = default;
 
+RichTextArea* RichTextArea::create(std::string text, std::string font, float scale) {
+    return RichTextArea::create(
+        std::move(font), std::move(text), scale,
+        CCDirector::sharedDirector()->getWinSize().width / 2,
+        false
+    );
+}
+
+RichTextArea* RichTextArea::create(std::string text, std::string font, float scale, float width) {
+    return RichTextArea::create(
+        std::move(font), std::move(text), scale, width, true
+    );
+}
+
+RichTextArea* RichTextArea::create(std::string font, std::string text, float scale, float width, const bool artificialWidth) {
+    RichTextArea* instance = new RichTextArea();
+    instance->m_impl = std::make_unique<RichTextArea::Impl>(instance);
+    if (instance->init(std::move(font), std::move(text), scale, width, artificialWidth)) {
+        instance->autorelease();
+        return instance;
+    }
+    delete instance;
+    return nullptr;
+};
+
 bool RichTextArea::init(std::string font, std::string text, float scale, float width, const bool artificialWidth) {
     m_impl->m_font = std::move(font);
     m_impl->m_text = std::move(text);
