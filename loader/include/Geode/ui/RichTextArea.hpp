@@ -112,17 +112,11 @@ namespace geode {
 
     /**
      * A SimpleTextArea with rich text formatting. Supports the following features:
-     * - Basic formatting (bold, italic, underline, etc)
      * - Links
      * - Colored text
      * - Mirrored text
      * - Flipped text
      * - Custom key support
-     *
-     * Just like MDTextArea, links also have some special protocols.
-     * Use `user:<accountID>` to link to a GD
-     * account; `level:<id>` to link to a GD level and
-     * `mod:<id>` to link to another Geode mod.
     */
     class GEODE_DLL RichTextArea final : public SimpleTextArea {
     public:

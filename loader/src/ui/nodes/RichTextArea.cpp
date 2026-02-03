@@ -1,6 +1,9 @@
+#include "Geode/cocos/robtop/sprite_nodes/CCFontSprite.h"
 #include "TextAreaImpl.hpp"
+#include <Geode/Result.hpp>
 #include <Geode/ui/RichTextArea.hpp>
 #include <Geode/ui/TextArea.hpp>
+#include <Geode/utils/string.hpp>
 #include <iterator>
 #include <memory>
 #include <regex>
@@ -284,7 +287,6 @@ void RichTextArea::Impl::addDefaultRichKeys() {
         "mirror",
         [](std::string value) -> Result<bool> {
             if (value == "") return Ok(true);
-
             if (value != "true" && value != "false") {
                 return Err("Value must be 'true' or 'false'");
             }
@@ -306,6 +308,21 @@ void RichTextArea::Impl::addDefaultRichKeys() {
         },
         [](const std::time_t& value) -> std::string {
             return fmt::format("{:%Y-%m-%d %H:%M:%S}", localtime(value));
+        }
+    ));
+
+    m_self->addRichKey<std::string>(std::make_shared<RichTextKey<std::string>>(
+        "link",
+        [](std::string value) -> Result<std::string> {
+            return Ok(value);
+        },
+        [](const std::string& href, cocos2d::CCFontSprite* sprite) {
+            sprite->setColor({ 0x7f, 0xf4, 0xf4 });
+
+            ccDrawSolidRect(
+                { 0, 0 }, { sprite->m_obContentSize.width, 1.f },
+                { 0x7f, 0xf4, 0xf4 }
+            );
         }
     ));
 }
