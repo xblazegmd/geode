@@ -53,13 +53,13 @@ namespace geode {
     protected:
         SimpleTextArea();
         ~SimpleTextArea() override;
-    
+
     private:
         static SimpleTextArea* create(std::string font, std::string text, float scale, float width, const bool artificialWidth);
 
         bool init(std::string font, std::string text, float scale, float width, const bool artificialWidth);
 
-    private:
+    protected:
         class Impl;
         std::unique_ptr<Impl> m_impl;
     };
