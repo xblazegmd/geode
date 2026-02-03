@@ -381,6 +381,9 @@ void RichTextArea::Impl::formatText() {
     }
 }
 
+RichTextArea::RichTextArea() : m_impl(std::make_unique<RichTextArea::Impl>(this)) {}
+RichTextArea::~RichTextArea() = default;
+
 bool RichTextArea::init(std::string font, std::string text, float scale, float width, const bool artificialWidth) {
     m_impl->m_font = std::move(font);
     m_impl->m_text = std::move(text);
