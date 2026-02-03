@@ -18,5 +18,5 @@ public:
     float m_lineHeight = 0.f;
     float m_linePadding = 0.f;
 
-    TextAreaImpl();
+    TextAreaImpl() = default;
 };
