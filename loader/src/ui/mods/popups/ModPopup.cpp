@@ -15,6 +15,7 @@
 #include "ConfirmUninstallPopup.hpp"
 #include "../settings/ModSettingsPopup.hpp"
 #include "../../../internal/about.hpp"
+#include "Geode/cocos/cocoa/CCObject.h"
 #include "server/DownloadManager.hpp"
 
 class FetchTextArea : public CCNode {
@@ -534,6 +535,7 @@ bool ModPopup::init(ModSource&& src) {
         { "github", "github.png"_spr, m_source.getMetadata().getLinks().getSourceURL(), nullptr },
         { "discord", "gj_discordIcon_001.png", m_source.getMetadata().getLinks().getCommunityURL(), nullptr },
         { "support", "gift.png"_spr, m_source.getMetadata().getSupportInfo(), menu_selector(ModPopup::onSupport) },
+        { "socials", "gj_ytIcon_001.png", m_source.getMetadata().getLinks().getYoutubeURL(), menu_selector(ModPopup::onSocials) }
     }) {
         auto spr = CCSprite::createWithSpriteFrameName(std::get<1>(stat));
         spr->setScale(.75f);
@@ -1193,6 +1195,16 @@ void ModPopup::onLink(CCObject* sender) {
 void ModPopup::onSupport(CCObject*) {
     openSupportPopup(m_source.getMetadata());
 }
+
+void ModPopup::onSocials(CCObject*) {
+    createQuickPopup(
+        "TODO",
+        "Socials",
+        "A", "B",
+        [](auto, bool btn2) {}
+    );
+}
+
 void ModPopup::onModtober24Info(CCObject*) {
     FLAlertLayer::create(
         "Modtober 2024",

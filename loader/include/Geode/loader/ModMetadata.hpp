@@ -38,6 +38,7 @@ namespace geode {
          * Get the URL for the source code repository for this mod
          */
         std::optional<std::string> getSourceURL() const;
+
         /**
          * Get the URL for the community page (Discord server etc.) for this mod
          */
