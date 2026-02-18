@@ -76,6 +76,11 @@ namespace geode {
         std::optional<std::string> m_homepage;
         std::optional<std::string> m_source;
         std::optional<std::string> m_community;
+
+        std::optional<std::string> m_youtube;
+        std::optional<std::string> m_twitter;
+        std::optional<std::string> m_github;
+        std::optional<std::string> m_discord;
     };
 
     class ModMetadata::Impl {

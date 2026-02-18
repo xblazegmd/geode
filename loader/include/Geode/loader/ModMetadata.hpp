@@ -43,6 +43,26 @@ namespace geode {
          */
         std::optional<std::string> getCommunityURL() const;
 
+        /**
+         * Get the URL for the YouTube profile of the mod developer
+         */
+        std::optional<std::string> getYoutubeURL() const;
+
+        /**
+         * Get the URL for the Twitter profile of the mod developer
+         */
+        std::optional<std::string> getTwitterURL() const;
+
+        /**
+         * Get the URL for the GitHub profile of the mod developer
+         */
+        std::optional<std::string> getGithubURL() const;
+
+        /**
+         * Get the URL for the Discord profile of the mod developer
+         */
+        std::optional<std::string> getDiscordURL() const;
+
 #if defined(GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
         Impl* getImpl();
 #endif
@@ -253,13 +273,13 @@ namespace geode {
         Result<> checkTargetVersions() const;
 
         /**
-         * Check if this `ModMetadata` had parsing errors (or was completely 
+         * Check if this `ModMetadata` had parsing errors (or was completely
          * unparseable)
          */
         bool hasErrors() const;
         std::vector<std::string> const& getErrors() const;
         /**
-         * Check if this `ModMetadata` was completely unparseable, i.e. created 
+         * Check if this `ModMetadata` was completely unparseable, i.e. created
          * from an invalid ZIP file etc.
          */
         bool wasCompletelyUnparseable() const;
@@ -291,14 +311,14 @@ namespace geode {
 #endif
 
         /**
-         * Create `ModMetadata` from a `.geode` package. Note that this 
-         * function may fail if the JSON data is wrong; make sure to check 
+         * Create `ModMetadata` from a `.geode` package. Note that this
+         * function may fail if the JSON data is wrong; make sure to check
          * `hasErrors()` afterwards on the `ModMetadata`!
          */
         static ModMetadata createFromGeodeFile(std::filesystem::path const& path);
         /**
-         * Create `ModMetadata` from a parsed json document. Note that this 
-         * function may fail if the JSON data is wrong; make sure to check 
+         * Create `ModMetadata` from a parsed json document. Note that this
+         * function may fail if the JSON data is wrong; make sure to check
          * `hasErrors()` afterwards on the `ModMetadata`!
          */
         static ModMetadata create(ModJson const& json);

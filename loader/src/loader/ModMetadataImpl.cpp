@@ -25,6 +25,22 @@ std::optional<std::string> ModMetadataLinks::getCommunityURL() const {
     return m_impl->m_community;
 }
 
+std::optional<std::string> ModMetadataLinks::getYoutubeURL() const {
+    return m_impl->m_youtube;
+}
+
+std::optional<std::string> ModMetadataLinks::getTwitterURL() const {
+    return m_impl->m_twitter;
+}
+
+std::optional<std::string> ModMetadataLinks::getGithubURL() const {
+    return m_impl->m_github;
+}
+
+std::optional<std::string> ModMetadataLinks::getDiscordURL() const {
+    return m_impl->m_discord;
+}
+
 #if defined(GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 ModMetadataLinks::Impl* ModMetadataLinks::getImpl() {
     return m_impl.get();
@@ -486,6 +502,14 @@ ModMetadata ModMetadata::Impl::parse(ModJson const& rawJson, std::optional<std::
         links.has("homepage").into(info.getLinksMut().getImpl()->m_homepage);
         links.has("source").into(info.getLinksMut().getImpl()->m_source);
         links.has("community").into(info.getLinksMut().getImpl()->m_community);
+
+        // Socials
+        if (auto socials = links.has("socials")) {
+            socials.has("youtube").into(info.getLinksMut().getImpl()->m_youtube);
+            socials.has("twitter").into(info.getLinksMut().getImpl()->m_twitter);
+            socials.has("github").into(info.getLinksMut().getImpl()->m_github);
+            socials.has("discord").into(info.getLinksMut().getImpl()->m_discord);
+        }
         // do not check unknown for future compat
     }
 
