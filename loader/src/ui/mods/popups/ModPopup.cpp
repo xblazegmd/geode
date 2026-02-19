@@ -13,6 +13,7 @@
 #include <Geode/utils/ColorProvider.hpp>
 #include <optional>
 #include "ConfirmUninstallPopup.hpp"
+#include "SocialsPopup.hpp"
 #include "../settings/ModSettingsPopup.hpp"
 #include "../../../internal/about.hpp"
 #include "Geode/cocos/cocoa/CCObject.h"
@@ -1197,12 +1198,18 @@ void ModPopup::onSupport(CCObject*) {
 }
 
 void ModPopup::onSocials(CCObject*) {
-    createQuickPopup(
-        "TODO",
-        "Socials",
-        "A", "B",
-        [](auto, bool btn2) {}
-    );
+    SocialsPopup::create(
+        m_source.getMetadata().getLinks().getYoutubeURL(),
+        m_source.getMetadata().getLinks().getTwitterURL(),
+        m_source.getMetadata().getLinks().getGithubURL(),
+        m_source.getMetadata().getLinks().getDiscordURL()
+    )->show();
+    // createQuickPopup(
+    //     "TODO",
+    //     "Socials",
+    //     "A", "B",
+    //     [](auto, bool btn2) {}
+    // );
 }
 
 void ModPopup::onModtober24Info(CCObject*) {
