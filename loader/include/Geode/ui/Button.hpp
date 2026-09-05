@@ -66,7 +66,7 @@ namespace geode {
         /**
          * Create a Button with a ButtonSprite
          * @param text The text shown in the button
-         * @param scale The scale of the ButtonSprite
+         * @param scale The scale of the text
          * @param activateCallback The callback for when the button is activated
          */
         static Button* createWithButtonSprite(geode::ZStringView text, float scale, ButtonCallback activateCallback = nullptr);
@@ -75,7 +75,7 @@ namespace geode {
          * Create a Button with a ButtonSprite
          * @param text The text shown in the button
          * @param font The font of the text
-         * @param bg The background of the button
+         * @param bg The background of the button (not in a spritesheet)
          * @param activateCallback The callback for when the button is activated
          */
         static Button* createWithButtonSprite(
@@ -89,8 +89,8 @@ namespace geode {
          * Create a Button with a ButtonSprite
          * @param text The text shown in the button
          * @param font The font of the text
-         * @param bg The background of the button
-         * @param scale The scale of the ButtonSprite
+         * @param bg The background of the button (not in a spritesheet)
+         * @param scale The scale of the text
          * @param activateCallback The callback for when the button is activated
          */
         static Button* createWithButtonSprite(
@@ -105,10 +105,10 @@ namespace geode {
          * Create a Button with a ButtonSprite
          * @param text The text shown in the button
          * @param font The font of the text
-         * @param bg The background of the button
-         * @param width The width of the button
-         * @param absolute Whether to use absolute sizing for the button sprite
-         * @param scale The scale of the ButtonSprite
+         * @param bg The background of the button (not in a spritesheet)
+         * @param width The width of the button (`absolute` must be true)
+         * @param absolute Whether to use absolute width or not
+         * @param scale The scale of the text
          * @param activateCallback The callback for when the button is activated
          */
         static Button* createWithButtonSprite(
@@ -125,11 +125,11 @@ namespace geode {
          * Create a Button with a ButtonSprite
          * @param text The text shown in the button
          * @param font The font of the text
-         * @param bg The background of the button
-         * @param width The width of the button
-         * @param height The height of the button
-         * @param absolute Whether to use absolute sizing for the button sprite
-         * @param scale The scale of the ButtonSprite
+         * @param bg The background of the button (not in a spritesheet)
+         * @param width The width of the button (`absolute` must be true)
+         * @param height The height of the button (0 automatically sets the height)
+         * @param absolute Whether to use absolute width or not
+         * @param scale The scale of the text
          * @param activateCallback The callback for when the button is activated
          */
         static Button* createWithButtonSprite(
