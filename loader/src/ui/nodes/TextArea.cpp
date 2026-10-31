@@ -5,7 +5,6 @@
 #include <Geode/cocos/robtop/sprite_nodes/CCFontSprite.h>
 #include <deque>
 #include <memory>
-#include <optional>
 #include <fmt/chrono.h>
 #include <asp/iter.hpp>
 
@@ -372,15 +371,9 @@ public:
     std::string m_rawText;
     std::deque<std::u32string> m_tagIRs;
 
-    size_t m_idx = 0;
-
     void parseRichText();
     void registerTag(const std::string& ir);
     Label* getErrorText();
-
-    char current();
-    std::optional<char> peek();
-    void advance(int offset = 1);
 
     void addRichTag(std::string id, bool requireArgs, ValidateArgs validate, CreateCallback, CharIterator iterator, bool updateText);
     void updateRichText();
@@ -392,154 +385,92 @@ public:
     RichImpl(RichTextArea* self) : m_self(self), SimpleTextAreaImpl(self) {}
 };
 
-enum class ParseState {
-    /// Normal state, don't parse anything
-    Normal,
-    /// Parse the opening tag
-    ParseTag,
-    /// Parse the opening tag's arguments
-    ParseArgs,
-    /// Parse the text in between the tags
-    ParseText,
-    /// Parse the closing tag
-    ParseClosing
-};
-
-// HOW PARSING WORKS:
-// - Parse the tags (e.g. "<t-1>tag<t>")
-// - Convert them to an "intermediate" (e.g. "!!![t-1|tag]")
-// - Add that intermediate to the emoji registry and work from there
 void RichTextArea::RichImpl::parseRichText() {
-    m_idx = 0;
     m_rawText = m_text;
+
     std::string newText;
-    ParseState state = ParseState::Normal;
+    std::deque<RichTag*> stack;
+    std::string replString;
 
-    RichTag* tag;
-    std::string id;
-    std::string args;
-    std::string text;
-    size_t tagPos;
-
-    auto handleError = [&] {
-        newText += m_text.substr(tagPos, m_idx - tagPos + 1);
-        state = ParseState::Normal;
-        id.clear();
-        args.clear();
-        text.clear();
+    auto addRepl = [&] {
+        replString += "]";
+        newText += replString;
+        this->registerTag(replString);
+        replString.clear();
     };
 
-    auto makeIR = [&] -> std::string {
-        return fmt::format(
-            "!!![{}{}|{}]",
-            id, args.empty() ? "" : "-" + args,
-            text
-        );
-    };
+    for (size_t i = 0; i < m_text.size(); i++) {
+        char c = m_text[i];
+        if (c == '<') {
+            auto closing = m_text.find('>', i);
+            if (closing == std::string::npos) {
+                newText += c;
+                continue;
+            }
 
-    while (m_idx < m_text.size()) {
-        char c = this->current();
-        switch (state) {
-            case ParseState::Normal:
-                if (c == '<') {
-                    auto p = this->peek();
-                    if (p && *p == '/') {
-                        newText += c;
-                        break;
-                    }
-                    tagPos = m_idx;
-                    state = ParseState::ParseTag;
-                } else {
+            auto tag = m_text.substr(i + 1, closing - i - 1);
+            if (tag.empty()) {
+                newText += c;
+                continue;
+            }
+
+            if (tag[0] == '/') {
+                if (stack.empty()) {
                     newText += c;
+                    continue;
                 }
-                break;
-            case ParseState::ParseTag:
-                id += c;
-                if (auto p = this->peek(); p && (*p == '>' || *p == '=' || *p == '-')) {
-                    auto match = std::ranges::find(m_tags, id, &RichTag::id);
-                    if (match == m_tags.end()) {
-                        handleError();
-                        break;
-                    }
-                    tag = &*match;
-                    if (*p == '>') {
-                        if (tag->requireArgs) {
-                            handleError();
-                            break;
-                        }
-                        state = ParseState::ParseText;
-                    } else {
-                        state = ParseState::ParseArgs;
-                    }
-                    this->advance();
+                auto t = std::ranges::find(stack, tag.substr(1), &RichTag::id);
+                if (t == stack.end()) {
+                    newText += c;
+                    continue;
                 }
-                break;
-            case ParseState::ParseArgs:
-                if (c == '>') {
-                    if (args.empty() && tag->requireArgs) {
-                        handleError();
-                        break;
-                    }
-                    if (!tag->validate(args)) {
-                        handleError();
-                        break;
-                    }
-                    state = ParseState::ParseText;
-                    break;
-                }
-                args += c;
-                break;
-            case ParseState::ParseText:
-                if (c == '<') {
-                    if (auto p = this->peek(); p && *p == '/') {
-                        state = ParseState::ParseClosing;
-                    }
-                    // TODO: Handle nested tags
-                    break;
-                }
-                if (c == '\n') {
-                    auto ir = makeIR();
-                    newText += ir + "\n";
-                    this->registerTag(ir);
-                    text.clear();
-                    break;
-                }
-                text += c;
-                break;
-            case ParseState::ParseClosing: {
-                if (c == '/') {
-                    this->advance();
-                }
-                std::string closeID;
-                while (m_idx < m_text.size() && this->current() != '>') {
-                    char ch = this->current();
-                    closeID += ch;
-                    this->advance();
-                }
-                if (m_idx >= m_text.size()) {
-                    handleError();
-                    break;
-                }
-                if (closeID != id) {
-                    handleError();
-                    break;
-                }
-                auto ir = makeIR();
-                newText += ir;
-                this->registerTag(ir);
-                state = ParseState::Normal;
-                id.clear();
-                args.clear();
-                text.clear();
-                break;
+
+                addRepl();
+                i += tag.length() + 1;
+                stack.pop_front();
+                continue;
+            }
+
+            std::string id;
+            std::string arg;
+            size_t argPos = tag.find_first_of("-=");
+            if (argPos != std::string::npos) {
+                arg = tag.substr(argPos + 1);
+                id = tag.substr(0, argPos);
+            } else {
+                id = tag;
+            }
+
+            auto it = std::ranges::find(m_tags, id, &RichTag::id);
+            if (it == std::ranges::end(m_tags)) {
+                newText += c;
+                continue;
+            }
+            auto richTag = &*it;
+
+            if (arg.empty() && richTag->requireArgs) {
+                newText += c;
+                continue;
+            }
+            if (richTag->validate && !richTag->validate(arg)) {
+                newText += c;
+                continue;
+            }
+
+            if (!stack.empty()) {
+                addRepl();
+            }
+
+            replString += fmt::format("!!![{}{}|", id, arg.empty() ? "" : "-" + arg);
+            i += tag.length() + 1;
+            stack.push_front(richTag);
+        } else {
+            if (!stack.empty()) {
+                replString += c;
+            } else {
+                newText += c;
             }
         }
-        this->advance();
-    }
-
-    // If the parser ever stopped abruptly
-    if (state != ParseState::Normal) {
-        newText += m_text.substr(tagPos);
     }
     m_text = newText;
 }
@@ -606,22 +537,6 @@ Label* RichTextArea::RichImpl::getErrorText() {
     auto ret = Label::create("ERROR", m_font.c_str());
     ret->setColor({ 255, 0, 0 });
     return ret;
-}
-
-char RichTextArea::RichImpl::current() {
-    return m_text[m_idx];
-}
-
-std::optional<char> RichTextArea::RichImpl::peek() {
-    auto i = m_idx + 1;
-    if (i >= m_text.size()) {
-        return std::nullopt;
-    }
-    return m_text[i];
-}
-
-void RichTextArea::RichImpl::advance(int offset) {
-    m_idx += offset;
 }
 
 void RichTextArea::RichImpl::addRichTag(
