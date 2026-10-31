@@ -596,6 +596,7 @@ RichTextArea* RichTextArea::create(std::string font, std::string text, float sca
 bool RichTextArea::init(std::string font, std::string text, float scale, float width, const bool artificialWidth) {
     if (!SimpleTextArea::init(font, text, scale, width, artificialWidth)) return false;
     m_richImpl->m_rawText = m_impl->m_text;
+    m_richImpl->m_emojiRegistry = EmojiRegistry::vanillaEmojis();
 
     // Default tags
     this->addRichTag(
