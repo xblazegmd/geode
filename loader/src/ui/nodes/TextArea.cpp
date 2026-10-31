@@ -392,7 +392,7 @@ void RichTextArea::RichImpl::parseRichText() {
     std::deque<RichTag*> stack;
     std::string replString;
 
-    auto addRepl = [&] {
+    auto addReplacementStr = [&] {
         replString += "]";
         newText += replString;
         this->registerTag(replString);
@@ -425,7 +425,7 @@ void RichTextArea::RichImpl::parseRichText() {
                     continue;
                 }
 
-                addRepl();
+                addReplacementStr();
                 i += tag.length() + 1;
                 stack.pop_front();
                 continue;
@@ -458,7 +458,7 @@ void RichTextArea::RichImpl::parseRichText() {
             }
 
             if (!stack.empty()) {
-                addRepl();
+                addReplacementStr();
             }
 
             replString += fmt::format("!!![{}{}|", id, arg.empty() ? "" : "-" + arg);
@@ -472,6 +472,12 @@ void RichTextArea::RichImpl::parseRichText() {
             }
         }
     }
+
+    if (!stack.empty()) {
+        replString += "]";
+        addReplacementStr();
+    }
+
     m_text = newText;
 }
 
